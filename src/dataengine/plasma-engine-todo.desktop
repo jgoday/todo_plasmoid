@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=TODO Data Engine
+X-KDE-ServiceTypes=Plasma/DataEngine
+Type=Service
+Icon=go-jump-today
+X-KDE-Library=plasma_engine_todo
+X-Plasma-EngineName=todo
+X-KDE-PluginInfo-Name=todo

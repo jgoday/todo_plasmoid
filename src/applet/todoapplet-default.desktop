@@ -1,0 +1,19 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=TODO applet
+Comment=TODO applet
+Icon=view-pim-tasks
+Type=Service
+ServiceTypes=Plasma/Applet
+
+X-KDE-Library=todoapplet
+
+X-KDE-PluginInfo-Author=Javier Goday
+X-KDE-PluginInfo-Email=
+X-KDE-PluginInfo-Name=todoapplet
+X-KDE-PluginInfo-Version=0.1
+X-KDE-PluginInfo-Website=http://plasma.kde.org/
+X-KDE-PluginInfo-Category=Misc
+X-KDE-PluginInfo-Depends=
+X-KDE-PluginInfo-License=GPL
+X-KDE-PluginInfo-EnabledByDefault=true
