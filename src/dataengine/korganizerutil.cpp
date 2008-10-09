@@ -31,6 +31,7 @@
 
 // kdepim headers
 #include <kcal/calendarresources.h>
+#include <kcal/incidenceformatter.h>
 #include <kcal/resourcelocal.h>
 
 
@@ -87,6 +88,7 @@ QList <QVariant> KOrganizerUtil::Private::todos()
             values ["startDate"] = todo->dtStart().date();
             values ["dueDate"] = todo->dtDue().date();
             values ["uid"] = todo->uid();
+            values ["tooltip"] = KCal::IncidenceFormatter::toolTipString(todo, true);
 
             todos << values;
         }

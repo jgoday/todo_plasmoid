@@ -22,7 +22,7 @@
 #include <QAbstractItemModel>
 #include <QApplication>
 
-TodoItemDelegate::TodoItemDelegate(QObject *parent) : QItemDelegate(parent)
+TodoItemDelegate::TodoItemDelegate(QObject *parent) : QStyledItemDelegate(parent)
 {
 }
 
@@ -47,13 +47,15 @@ void TodoItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 
     QStyleOptionViewItem textOption = option;
 
+    QStyledItemDelegate::paint(painter, textOption, index);
+
     // only draw the progress bar if the todo is already started
     if (model && model->data(index, TodoModel::PercentRole).toInt() > 0) {
         QStyleOptionProgressBar progressBarOption;
         progressBarOption.rect = QRect(option.rect.x() + option.rect.width() - 60,
-                                       option.rect.y() + 1,
-                                       59,
-                                       option.rect.height() - 2);
+                                       option.rect.y() + 4,
+                                       56,
+                                       option.rect.height() - 8);
         progressBarOption.fontMetrics = QApplication::fontMetrics();
         progressBarOption.minimum = 0;
         progressBarOption.maximum = 100;
@@ -65,10 +67,9 @@ void TodoItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 
         QApplication::style()->drawControl(QStyle::CE_ProgressBar, &progressBarOption, painter);
 
-        textOption.rect.setWidth(option.rect.width() - 60);
+       // textOption.rect.setWidth(option.rect.width() - 60);
     }
 
-    QItemDelegate::paint(painter, textOption, index);
 }
 
 void TodoItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
@@ -90,5 +91,5 @@ QSize TodoItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QMode
     Q_UNUSED(option)
     Q_UNUSED(index)
 
-    return QSize(200, 25);
+    return QSize(200, 32);
 }

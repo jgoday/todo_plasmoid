@@ -1,19 +1,19 @@
-/*                                                                                         
- *   This program is free software; you can redistribute it and/or modify                  
- *   it under the terms of the GNU Library General Public License version 2 as             
- *   published by the Free Software Foundation                                             
- *                                                                                         
- *   Copyright (C) 2008 by Javier Goday <jgoday@gmail.com>                                 
- *                                                                                         
- *   This program is distributed in the hope that it will be useful,                       
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of                        
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                         
- *   GNU General Public License for more details                                           
- *                                                                                         
- *   You should have received a copy of the GNU Library General Public                     
- *   License along with this program; if not, write to the                                 
- *   Free Software Foundation, Inc.,                                                       
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.                         
+/*
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU Library General Public License version 2 as
+ *   published by the Free Software Foundation
+ *
+ *   Copyright (C) 2008 by Javier Goday <jgoday@gmail.com>
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include "korganizerutil.h"
 
@@ -32,6 +32,29 @@
 #include <KWindowSystem>
 
 
+void KOrganizerUtil::showTodo(const QString &uid)
+{
+    checkAndLaunchKontact();
+
+    OrgKdeKorganizerKorganizerInterface interface("org.kde.korganizer",
+                                                  "/Korganizer",
+                                                  QDBusConnection::sessionBus());
+    interface.showIncidence(uid);
+    KOrganizerUtil::showMainWindow();
+}
+
+void KOrganizerUtil::showAddTodo()
+{
+    checkAndLaunchKontact();
+
+    OrgKdeKorganizerCalendarInterface interface("org.kde.korganizer",
+                                                  "/Calendar",
+                                                  QDBusConnection::sessionBus());
+    interface.openTodoEditor(i18n("new todo"));
+    KOrganizerUtil::showMainWindow();
+}
+
+
 void KOrganizerUtil::showMainWindow()
 {
     QDBusInterface kontactInterface("org.kde.korganizer",
@@ -43,26 +66,10 @@ void KOrganizerUtil::showMainWindow()
     KWindowSystem::forceActiveWindow (kontactWinId, 1);
 }
 
-void KOrganizerUtil::showTodo(const QString &uid)
+void KOrganizerUtil::checkAndLaunchKontact()
 {
     if(!QDBusConnection::sessionBus().interface()->isServiceRegistered("org.kde.kontact"))
     {
         KToolInvocation::kdeinitExecWait("kontact");
     }
-
-    OrgKdeKorganizerKorganizerInterface interface("org.kde.korganizer",
-                                                  "/Korganizer",
-                                                  QDBusConnection::sessionBus());
-    interface.showIncidence(uid);
-    KOrganizerUtil::showMainWindow();
 }
-
-void KOrganizerUtil::showAddTodo()
-{
-    OrgKdeKorganizerCalendarInterface interface("org.kde.korganizer",
-                                                  "/Calendar",
-                                                  QDBusConnection::sessionBus());
-    interface.openTodoEditor(i18n("new todo"));
-    KOrganizerUtil::showMainWindow();
-}
-

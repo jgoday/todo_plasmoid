@@ -40,9 +40,11 @@ void TodoModel::addTodoItem(const QMap <QString, QVariant> &values)
     item->setData(values ["categories"].toString(), Qt::UserRole);
     item->setData(values ["percentComplete"].toInt(), TodoModel::PercentRole);
     item->setData(values ["uid"].toString(), TodoModel::UIDRole);
+    item->setToolTip(values ["tooltip"].toString());
 
     // if today is the due date we show an alarm icon on the todo
-    if (values ["dueDate"].toDate() == QDate::currentDate()) {
+    if (values ["dueDate"].toDate() == QDate::currentDate() ||
+        (values ["dueDate"].toDate () < QDate::currentDate() && values ["percentComplete"].toInt() < 100)) {
         item->setIcon(KIcon("appointment-reminder"));
     }
 
@@ -53,11 +55,7 @@ void TodoModel::addTodoItem(const QMap <QString, QVariant> &values)
 void TodoModel::setCategory(const QModelIndex &index, const QColor &color)
 {
     QStandardItem *item = itemFromIndex(index);
-    QColor alphaColor = color;
-    alphaColor.setAlpha(150);
-    QBrush brush(alphaColor);
-
-    item->setBackground(brush);
+    item->setData(color, Qt::BackgroundRole);
 }
 
 void TodoModel::categorizeItem(QStandardItem *item, const QMap <QString, QVariant> &values)

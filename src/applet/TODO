@@ -1,4 +1,4 @@
-- Call korganizer to show a todo item when dbl click [done]
+- [done] Call korganizer to show a todo item when dbl click
 - Allow categorize by startDate and dueDate (actually only can categorize by startDate)
-- Add tooltip
+- [done] Add tooltip
 

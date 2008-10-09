@@ -19,12 +19,12 @@
 #define TODOITEMDELEGATE_H
 
 // qt headers
-#include <QItemDelegate>
+#include <QStyledItemDelegate>
 
 /**
 * Used to show the percentage bar on the view
 */
-class TodoItemDelegate : public QItemDelegate
+class TodoItemDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
