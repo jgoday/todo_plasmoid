@@ -22,6 +22,7 @@
 #include <QStandardItemModel>
 
 class QStandardItem;
+class TodoModelCategoryDelegate;
 
 /**
 * Model of the view
@@ -35,8 +36,15 @@ public:
         PercentRole = 0x10,
         UIDRole = 0x16
     };
+    enum TodoCategoryType {
+        ByStartDate,
+        ByDueDate
+    };
     TodoModel(QObject *parent = 0);
     ~TodoModel();
+
+public:
+    void setCategoryType(TodoCategoryType type);
 
 public slots:
     void addTodoItem(const QMap <QString, QVariant> &values);
@@ -44,6 +52,11 @@ public slots:
 
 private:
     void categorizeItem(QStandardItem *item, const QMap <QString, QVariant> &values);
+    void categorizeItems();
+
+private:
+    TodoCategoryType m_categoryType;
+    TodoModelCategoryDelegate *m_categoryDelegate;
 };
 
 #endif

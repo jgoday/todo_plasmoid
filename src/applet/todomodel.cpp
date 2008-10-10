@@ -16,22 +16,41 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include "todomodel.h"
+#include "todomodelcategorydelegate.h"
 
 // qt headers
 #include <QDate>
 #include <QStandardItem>
 
 // kde headers
-#include <kcategorizedsortfilterproxymodel.h>
 #include <KIcon>
-#include <KLocale>
 
-TodoModel::TodoModel(QObject *parent) : QStandardItemModel(parent)
+TodoModel::TodoModel(QObject *parent) : QStandardItemModel(parent),
+    m_categoryDelegate(0)
 {
+    setCategoryType(TodoModel::ByDueDate);
 }
 
 TodoModel::~TodoModel()
 {
+}
+
+void TodoModel::setCategoryType(TodoCategoryType type)
+{
+    m_categoryType = type;
+
+    delete m_categoryDelegate;
+
+    switch (type) {
+        case TodoModel::ByDueDate:
+            m_categoryDelegate = new DueDateCategoryDelegate(this);
+            break;
+        default:
+            m_categoryDelegate = new StartDateCategoryDelegate(this);
+            break;
+    }
+
+    categorizeItems();
 }
 
 void TodoModel::addTodoItem(const QMap <QString, QVariant> &values)
@@ -60,35 +79,9 @@ void TodoModel::setCategory(const QModelIndex &index, const QColor &color)
 
 void TodoModel::categorizeItem(QStandardItem *item, const QMap <QString, QVariant> &values)
 {
-    int categorySort = 0;
+    m_categoryDelegate->categorizeItem(item, values);
+}
 
-    QDate date = values ["startDate"].toDate();
-    QVariant value;
-
-    if (date == QDate::currentDate()) {
-        value = QVariant(i18n("Started today"));
-    }
-    else if (date.daysTo(QDate::currentDate()) <= 1) {
-        categorySort = 1;
-        value = QVariant(i18n("Started yesterday"));
-    }
-    else if (date.daysTo(QDate::currentDate()) <= 7) {
-        categorySort = 2;
-        value = QVariant(i18n("Started last week"));
-    }
-    else if (date.daysTo(QDate::currentDate()) <= 30) {
-        categorySort = 3;
-        value = QVariant(i18n("Started last month"));
-    }
-    else if (date.isValid()) {
-        categorySort = 4;
-        value = QVariant(i18n("Started a long time ago"));
-    }
-    else {
-        categorySort = 5;
-        value = QVariant(i18n("Not started"));
-    }
-
-    item->setData(value, KCategorizedSortFilterProxyModel::CategoryDisplayRole);
-    item->setData(categorySort, KCategorizedSortFilterProxyModel::CategorySortRole);
+void TodoModel::categorizeItems()
+{
 }

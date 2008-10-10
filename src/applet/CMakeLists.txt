@@ -3,6 +3,7 @@ project(TODOAPPLET)
 set(todoapplet_SRCS
     todoapplet.cpp
     todomodel.cpp
+    todomodelcategorydelegate.cpp
     todoview.cpp
     todoitemdelegate.cpp
     korganizerutil.cpp
