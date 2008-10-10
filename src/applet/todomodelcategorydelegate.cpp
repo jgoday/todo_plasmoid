@@ -122,7 +122,7 @@ void DueDateCategoryDelegate::categorizeItem(QStandardItem *item, const QMap <QS
         value = QVariant(i18n("Completed"));
     }
     else if (!date.isValid()) {
-        categorySort = 7;
+        categorySort = 9;
         value = QVariant(i18n("Without planification"));
     }
     else if (date == QDate::currentDate()) {
@@ -137,16 +137,30 @@ void DueDateCategoryDelegate::categorizeItem(QStandardItem *item, const QMap <QS
         categorySort = 3;
         value = QVariant(i18n("For tomorrow"));
     }
-    else if (QDate::currentDate().daysTo(date) > 1 && QDate::currentDate().daysTo(date) < 7) {
-        categorySort = 4;
-        value = QVariant(i18n("For this week"));
+    else if (QDate::currentDate().daysTo(date) > 1 &&
+             QDate::currentDate().daysTo(date) < 7) {
+        if (date.dayOfWeek() >= QDate::currentDate().dayOfWeek()) {
+            categorySort = 4;
+            value = QVariant(i18n("For this week"));
+        }
+        else {
+            categorySort = 5;
+            value = QVariant(i18n("For the next week"));
+        }
     }
-    else if (QDate::currentDate().daysTo(date) > 7 && QDate::currentDate().daysTo(date) < 30) {
-        categorySort = 5;
-        value = QVariant(i18n("For this month"));
+    else if (QDate::currentDate().daysTo(date) > 7 &&
+             QDate::currentDate().daysTo(date) < 30) {
+        if (date.daysInMonth() >= QDate::currentDate().daysInMonth()) {
+            categorySort = 6;
+            value = QVariant(i18n("For this month"));
+        }
+        else {
+            categorySort = 7;
+            value = QVariant(i18n("For the next month"));
+        }
     }
     else if (QDate::currentDate().daysTo(date) > 30) {
-        categorySort = 5;
+        categorySort = 8;
         value = QVariant(i18n("I still have enough time"));
     }
 
