@@ -30,9 +30,10 @@
 #include <QVBoxLayout>
 
 // kde headers
+#include <KColorScheme>
+#include <KConfigDialog>
 #include <KIcon>
 #include <KIconLoader>
-#include <KColorScheme>
 #include <kcategorizedsortfilterproxymodel.h>
 
 // plasma headers
@@ -55,8 +56,10 @@ TodoApplet::TodoApplet(QObject *parent, const QVariantList &args) :
     m_types(0),
     m_proxyWidget(0),
     m_widget(0),
-    m_view(0)
+    m_view(0),
+    m_configUi()
 {
+    setHasConfigurationInterface(true);
 }
 
 TodoApplet::~TodoApplet()
@@ -74,6 +77,9 @@ void TodoApplet::init()
     m_proxyModel->sort(0);
     m_proxyModel->setSourceModel(m_model);
     m_proxyModel->setFilterRole(Qt::UserRole);
+
+    KConfigGroup configGroup = config();
+    m_model->setCategoryType(configGroup.readEntry("CategoryType", 0));
 
     // categories proxy
     m_types = new QComboBox();
@@ -194,6 +200,7 @@ void TodoApplet::doLayout()
             dialogLayout->addWidget(m_widget);
 
             m_dialog = new Plasma::Dialog(0);
+            m_dialog->setMinimumSize(QSize(300, 200));
             m_dialog->setFocusPolicy(Qt::NoFocus);
             m_dialog->setWindowFlags(Qt::Popup);
             m_dialog->setLayout(dialogLayout);
@@ -271,4 +278,33 @@ void TodoApplet::slotOpenTodo(const QModelIndex &index)
 void TodoApplet::slotAddTodo()
 {
     KOrganizerUtil::showAddTodo();
+}
+
+void TodoApplet::createConfigurationInterface(KConfigDialog *parent)
+{
+    QWidget *widget = new QWidget();
+    m_configUi.setupUi(widget);
+    parent->setButtons(KDialog::Ok | KDialog::Cancel | KDialog::Apply);
+
+    connect(parent, SIGNAL(applyClicked()), this, SLOT(configAccepted()));
+    connect(parent, SIGNAL(okClicked()), this, SLOT(configAccepted()));
+
+    parent->addPage(widget, parent->windowTitle(), icon());
+
+    // category types
+    m_configUi.categoryTypeBox->addItem(i18n("By start date"),
+                                     QVariant(TodoModel::ByStartDate));
+    m_configUi.categoryTypeBox->addItem(i18n("By due date"),
+                                     QVariant(TodoModel::ByDueDate));
+    m_configUi.categoryTypeBox->setCurrentIndex(m_model->categoryType());
+}
+
+void TodoApplet::configAccepted()
+{
+    m_model->setCategoryType(m_configUi.categoryTypeBox->itemData(
+                               m_configUi.categoryTypeBox->currentIndex()).toInt());
+    KConfigGroup cg = config();
+    cg.writeEntry("CategoryType", QVariant(m_model->categoryType()));
+
+    emit configNeedsSaving();
 }

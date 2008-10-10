@@ -25,17 +25,17 @@
 // kde headers
 #include <KIcon>
 
-TodoModel::TodoModel(QObject *parent) : QStandardItemModel(parent),
+TodoModel::TodoModel(QObject *parent, int type) : QStandardItemModel(parent),
+    m_categoryType(type),
     m_categoryDelegate(0)
 {
-    setCategoryType(TodoModel::ByDueDate);
 }
 
 TodoModel::~TodoModel()
 {
 }
 
-void TodoModel::setCategoryType(TodoCategoryType type)
+void TodoModel::setCategoryType(int type)
 {
     m_categoryType = type;
 
@@ -53,12 +53,20 @@ void TodoModel::setCategoryType(TodoCategoryType type)
     categorizeItems();
 }
 
+int TodoModel::categoryType() const
+{
+    return m_categoryType;
+}
+
 void TodoModel::addTodoItem(const QMap <QString, QVariant> &values)
 {
     QStandardItem *item = new QStandardItem(values ["summary"].toString());
     item->setData(values ["categories"].toString(), Qt::UserRole);
     item->setData(values ["percentComplete"].toInt(), TodoModel::PercentRole);
     item->setData(values ["uid"].toString(), TodoModel::UIDRole);
+    item->setData(values ["startDate"].toDate(), TodoModel::StartDateRole);
+    item->setData(values ["dueDate"].toDate(), TodoModel::DueDateRole);
+
     item->setToolTip(values ["tooltip"].toString());
 
     // if today is the due date we show an alarm icon on the todo
@@ -67,7 +75,7 @@ void TodoModel::addTodoItem(const QMap <QString, QVariant> &values)
         item->setIcon(KIcon("appointment-reminder"));
     }
 
-    categorizeItem(item, values);
+    categorizeItem(item);
     insertRow(0, item);
 }
 
@@ -77,11 +85,14 @@ void TodoModel::setCategory(const QModelIndex &index, const QColor &color)
     item->setData(color, Qt::BackgroundRole);
 }
 
-void TodoModel::categorizeItem(QStandardItem *item, const QMap <QString, QVariant> &values)
+void TodoModel::categorizeItem(QStandardItem *item)
 {
-    m_categoryDelegate->categorizeItem(item, values);
+    m_categoryDelegate->categorizeItem(item);
 }
 
 void TodoModel::categorizeItems()
 {
+    for (int i = 0; i < rowCount(); i++) {
+        m_categoryDelegate->categorizeItem(item(i));
+    }
 }

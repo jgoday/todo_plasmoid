@@ -34,7 +34,7 @@ public:
     TodoModelCategoryDelegate(QObject *parent = 0);
     ~TodoModelCategoryDelegate();
 
-    virtual void categorizeItem(QStandardItem *, const QMap <QString, QVariant> &values);
+    virtual void categorizeItem(QStandardItem *);
 
 protected:
     void setDisplayRole(QStandardItem *, const QVariant &value);
@@ -50,7 +50,7 @@ public:
     StartDateCategoryDelegate(QObject *parent = 0);
     ~StartDateCategoryDelegate();
 
-    void categorizeItem(QStandardItem *, const QMap <QString, QVariant> &values);
+    void categorizeItem(QStandardItem *);
 };
 
 /**
@@ -62,7 +62,7 @@ public:
     DueDateCategoryDelegate(QObject *parent = 0);
     ~DueDateCategoryDelegate();
 
-    void categorizeItem(QStandardItem *, const QMap <QString, QVariant> &values);
+    void categorizeItem(QStandardItem *);
 };
 
 #endif

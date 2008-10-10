@@ -12,6 +12,8 @@ set(todoapplet_SRCS
 qt4_add_dbus_interface(todoapplet_SRCS org.kde.korganizer.Korganizer.xml korganizer_interface)
 qt4_add_dbus_interface(todoapplet_SRCS org.kde.Korganizer.Calendar.xml calendar_interface)
 
+kde4_add_ui_files(todoapplet_SRCS todoappletconfig.ui)
+
 kde4_add_plugin(todoapplet ${todoapplet_SRCS})
 target_link_libraries(todoapplet ${PLASMA_LIBS} ${KDE4_KDEUI_LIBS})
 

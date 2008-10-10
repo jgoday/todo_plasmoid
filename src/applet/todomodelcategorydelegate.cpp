@@ -16,6 +16,7 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include "todomodelcategorydelegate.h"
+#include "todomodel.h"
 
 // qt headers
 #include <QDate>
@@ -34,10 +35,9 @@ TodoModelCategoryDelegate::~TodoModelCategoryDelegate()
 {
 }
 
-void TodoModelCategoryDelegate::categorizeItem(QStandardItem *item, const QMap <QString, QVariant> &values)
+void TodoModelCategoryDelegate::categorizeItem(QStandardItem *item)
 {
     Q_UNUSED(item)
-    Q_UNUSED(values)
 }
 
 void TodoModelCategoryDelegate::setDisplayRole(QStandardItem *item, const QVariant &value)
@@ -60,14 +60,14 @@ StartDateCategoryDelegate::~StartDateCategoryDelegate()
 {
 }
 
-void StartDateCategoryDelegate::categorizeItem(QStandardItem *item, const QMap <QString, QVariant> &values)
+void StartDateCategoryDelegate::categorizeItem(QStandardItem *item)
 {
     int categorySort = 0;
 
-    QDate date = values ["startDate"].toDate();
+    QDate date = item->data(TodoModel::StartDateRole).toDate();
     QVariant value;
 
-    if (values ["percent"].toInt() == 100) {
+    if (item->data(TodoModel::PercentRole).toInt() == 100) {
         categorySort = 0;
         value = QVariant(i18n("Completed"));
     }
@@ -110,14 +110,14 @@ DueDateCategoryDelegate::~DueDateCategoryDelegate()
 {
 }
 
-void DueDateCategoryDelegate::categorizeItem(QStandardItem *item, const QMap <QString, QVariant> &values)
+void DueDateCategoryDelegate::categorizeItem(QStandardItem *item)
 {
     int categorySort = 0;
 
-    QDate date = values ["dueDate"].toDate();
+    QDate date = item->data(TodoModel::DueDateRole).toDate();
     QVariant value;
 
-    if (values ["percent"].toInt() == 100) {
+    if (item->data(TodoModel::PercentRole).toInt() == 100) {
         categorySort = 0;
         value = QVariant(i18n("Completed"));
     }

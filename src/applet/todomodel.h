@@ -34,28 +34,32 @@ class TodoModel : public QStandardItemModel
 public:
     enum TodoRole {
         PercentRole = 0x10,
-        UIDRole = 0x16
+        UIDRole = 0x16,
+        StartDateRole = 0x17,
+        DueDateRole = 0x18
     };
     enum TodoCategoryType {
-        ByStartDate,
-        ByDueDate
+        ByStartDate = 0,
+        ByDueDate = 1
     };
-    TodoModel(QObject *parent = 0);
+
+    TodoModel(QObject *parent = 0, int type = TodoModel::ByStartDate);
     ~TodoModel();
 
 public:
-    void setCategoryType(TodoCategoryType type);
+    void setCategoryType(int type);
+    int categoryType() const;
 
 public slots:
     void addTodoItem(const QMap <QString, QVariant> &values);
     void setCategory(const QModelIndex &index, const QColor &color);
 
 private:
-    void categorizeItem(QStandardItem *item, const QMap <QString, QVariant> &values);
+    void categorizeItem(QStandardItem *item);
     void categorizeItems();
 
 private:
-    TodoCategoryType m_categoryType;
+    int m_categoryType;
     TodoModelCategoryDelegate *m_categoryDelegate;
 };
 
