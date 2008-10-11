@@ -267,6 +267,8 @@ void TodoApplet::updateTodoList(const QList <QVariant> &todos)
 
         m_model->addTodoItem(values);
     }
+
+	m_view->reset();
 }
 
 void TodoApplet::slotOpenTodo(const QModelIndex &index)
@@ -303,6 +305,8 @@ void TodoApplet::configAccepted()
 {
     m_model->setCategoryType(m_configUi.categoryTypeBox->itemData(
                                m_configUi.categoryTypeBox->currentIndex()).toInt());
+	m_view->reset();
+
     KConfigGroup cg = config();
     cg.writeEntry("CategoryType", QVariant(m_model->categoryType()));
 
