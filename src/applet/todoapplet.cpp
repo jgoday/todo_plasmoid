@@ -59,7 +59,10 @@ TodoApplet::TodoApplet(QObject *parent, const QVariantList &args) :
     m_view(0),
     m_configUi()
 {
+    setAspectRatioMode(Plasma::IgnoreAspectRatio);
     setHasConfigurationInterface(true);
+
+    resize(160, 190);
 }
 
 TodoApplet::~TodoApplet()
@@ -228,7 +231,6 @@ void TodoApplet::doLayout()
 
             m_layout->addItem(m_proxyWidget);
 
-            resize(QSize(160, 190));
             setMinimumSize(QSize(160, 190));
         }
     }
