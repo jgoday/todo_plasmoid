@@ -30,7 +30,7 @@
 
 namespace Plasma {
     class Dialog;
-    class Icon;
+    class IconWidget;
 }
 
 class QComboBox;
@@ -78,7 +78,7 @@ private:
     Plasma::DataEngine    *m_engine;
 
     Plasma::Dialog        *m_dialog; // dialog in case ****
-    Plasma::Icon          *m_icon; // panel icon in case ****
+    Plasma::IconWidget    *m_icon; // panel icon in case ****
     QGraphicsLinearLayout *m_layout; // main applet layout
     QComboBox             *m_types; // todos categories combobox
     QGraphicsProxyWidget  *m_proxyWidget; // proxy widget

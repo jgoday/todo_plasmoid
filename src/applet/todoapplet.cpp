@@ -38,7 +38,7 @@
 
 // plasma headers
 #include <Plasma/Dialog>
-#include <Plasma/Icon>
+#include <Plasma/IconWidget>
 #include <Plasma/Theme>
 
 K_EXPORT_PLASMA_APPLET(todoapplet, TodoApplet)
@@ -209,7 +209,7 @@ void TodoApplet::doLayout()
             m_dialog->setLayout(dialogLayout);
 
             // panel icon
-            m_icon = new Plasma::Icon(KIcon("view-pim-tasks"), QString(), this);
+            m_icon = new Plasma::IconWidget(KIcon("view-pim-tasks"), QString(), this);
             m_layout->addItem(m_icon);
             connect(m_icon, SIGNAL(clicked()), SLOT(showDialog()));
 
