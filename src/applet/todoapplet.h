@@ -25,13 +25,8 @@
 #include <QMap>
 
 // Plasma includes
-#include <Plasma/Applet>
+#include <Plasma/PopupApplet>
 #include <Plasma/DataEngine>
-
-namespace Plasma {
-    class Dialog;
-    class IconWidget;
-}
 
 class QComboBox;
 class QGraphicsLinearLayout;
@@ -42,7 +37,7 @@ class KConfigDialog;
 class TodoModel;
 class TodoView;
 
-class TodoApplet : public Plasma::Applet
+class TodoApplet : public Plasma::PopupApplet
 {
     Q_OBJECT
 public:
@@ -50,13 +45,12 @@ public:
     ~TodoApplet();
 
     void init();
-    void constraintsEvent(Plasma::Constraints constraints);
+    QWidget *widget();
 
 public slots:
     void dataUpdated(const QString &name, const Plasma::DataEngine::Data &data);
 
 private slots:
-    void showDialog();
     void slotOpenTodo(const QModelIndex &index);
     void slotAddTodo();
 
@@ -77,9 +71,6 @@ private:
 private:
     Plasma::DataEngine    *m_engine;
 
-    Plasma::Dialog        *m_dialog; // dialog in case ****
-    Plasma::IconWidget    *m_icon; // panel icon in case ****
-    QGraphicsLinearLayout *m_layout; // main applet layout
     QComboBox             *m_types; // todos categories combobox
     QGraphicsProxyWidget  *m_proxyWidget; // proxy widget
     QWidget               *m_widget; // main widget

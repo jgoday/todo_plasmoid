@@ -37,8 +37,6 @@
 #include <kcategorizedsortfilterproxymodel.h>
 
 // plasma headers
-#include <Plasma/Dialog>
-#include <Plasma/IconWidget>
 #include <Plasma/Theme>
 
 K_EXPORT_PLASMA_APPLET(todoapplet, TodoApplet)
@@ -48,11 +46,8 @@ static const char *COLOR_SOURCE    = "Colors";
 static const char *TODO_SOURCE     = "Todos";
 
 TodoApplet::TodoApplet(QObject *parent, const QVariantList &args) :
-    Plasma::Applet(parent, args),
+    Plasma::PopupApplet(parent, args),
     m_engine(0),
-    m_dialog(0),
-    m_icon(0),
-    m_layout(0),
     m_types(0),
     m_proxyWidget(0),
     m_widget(0),
@@ -62,7 +57,7 @@ TodoApplet::TodoApplet(QObject *parent, const QVariantList &args) :
     setAspectRatioMode(Plasma::IgnoreAspectRatio);
     setHasConfigurationInterface(true);
 
-    resize(160, 190);
+    setPopupIcon("view-pim-tasks");
 }
 
 TodoApplet::~TodoApplet()
@@ -92,13 +87,7 @@ void TodoApplet::init()
     // applet main widget
     m_widget = new QWidget();
 
-    // applet main layout
-    m_layout = new QGraphicsLinearLayout(this);
-    m_layout->setContentsMargins(0, 0, 0, 0);
-    m_layout->setSpacing(0);
-    m_layout->setOrientation(Qt::Vertical);
-
-    setLayout(m_layout);
+    //setLayout(m_layout);
     doLayout();
 
     m_engine = dataEngine("todo");
@@ -109,15 +98,9 @@ void TodoApplet::init()
     }
 }
 
-void TodoApplet::constraintsEvent(Plasma::Constraints constraints)
+QWidget *TodoApplet::widget()
 {
-    if (constraints & Plasma::FormFactorConstraint) {
-        doLayout();
-    }
-
-    if (m_icon && constraints & Plasma::SizeConstraint) {
-        m_icon->resize(geometry().size());
-    }
+    return m_widget;
 }
 
 void TodoApplet::dataUpdated(const QString &name, const Plasma::DataEngine::Data &data)
@@ -130,17 +113,6 @@ void TodoApplet::dataUpdated(const QString &name, const Plasma::DataEngine::Data
     }
     else if (QString::compare(name, TODO_SOURCE) == 0) {
         updateTodoList(data["todos"].toList());
-    }
-}
-
-void TodoApplet::showDialog()
-{
-    if (m_dialog->isVisible()) {
-        m_dialog->hide();
-    }
-    else {
-        m_dialog->show();
-        m_dialog->move(popupPosition(m_dialog->sizeHint()));
     }
 }
 
@@ -186,54 +158,6 @@ void TodoApplet::doLayout()
 
         m_widget->setLayout(layout);
     }
-
-    if (formFactor() != Plasma::Planar && formFactor() != Plasma::MediaCenter) {
-        if (m_proxyWidget) {
-            m_proxyWidget->setWidget(0);
-            m_layout->removeItem(m_proxyWidget);
-            delete m_proxyWidget;
-        }
-
-        if (!m_icon) {
-            setBackgroundHints(NoBackground);
-            setAspectRatioMode(Plasma::ConstrainedSquare);
-            setMinimumSize(QSize(16, 16));
-
-            QVBoxLayout *dialogLayout = new QVBoxLayout();
-            dialogLayout->addWidget(m_widget);
-
-            m_dialog = new Plasma::Dialog(0);
-            m_dialog->setMinimumSize(QSize(300, 200));
-            m_dialog->setFocusPolicy(Qt::NoFocus);
-            m_dialog->setWindowFlags(Qt::Popup);
-            m_dialog->setLayout(dialogLayout);
-
-            // panel icon
-            m_icon = new Plasma::IconWidget(KIcon("view-pim-tasks"), QString(), this);
-            m_layout->addItem(m_icon);
-            connect(m_icon, SIGNAL(clicked()), SLOT(showDialog()));
-
-            m_icon->resize(geometry().size());
-        }
-    }
-    else {
-        if (m_icon) {
-            m_layout->removeItem(m_icon);
-        }
-        delete m_dialog;
-        delete m_icon;
-
-        if (!m_proxyWidget) {
-            setBackgroundHints(StandardBackground);
-
-            m_proxyWidget = new QGraphicsProxyWidget(this);
-            m_proxyWidget->setWidget(m_widget);
-
-            m_layout->addItem(m_proxyWidget);
-
-            setMinimumSize(QSize(160, 190));
-        }
-    }
 }
 
 void TodoApplet::updateCategories(const QStringList &categories)
@@ -270,7 +194,7 @@ void TodoApplet::updateTodoList(const QList <QVariant> &todos)
         m_model->addTodoItem(values);
     }
 
-	m_view->reset();
+    m_view->reset();
 }
 
 void TodoApplet::slotOpenTodo(const QModelIndex &index)
@@ -307,7 +231,7 @@ void TodoApplet::configAccepted()
 {
     m_model->setCategoryType(m_configUi.categoryTypeBox->itemData(
                                m_configUi.categoryTypeBox->currentIndex()).toInt());
-	m_view->reset();
+    m_view->reset();
 
     KConfigGroup cg = config();
     cg.writeEntry("CategoryType", QVariant(m_model->categoryType()));
