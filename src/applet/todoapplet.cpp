@@ -133,6 +133,9 @@ void TodoApplet::doLayout()
         QLabel *icon = new QLabel();
         icon->setPixmap(KIcon("view-pim-tasks").pixmap(KIconLoader::SizeMedium, KIconLoader::SizeMedium));
 
+        m_widget->setObjectName("main_widget");
+        m_widget->setStyleSheet("#main_widget {background: transparent}");
+
         QHBoxLayout *titleLayout = new QHBoxLayout();
         titleLayout->setSpacing(0);
         titleLayout->setMargin(0);
@@ -172,14 +175,16 @@ void TodoApplet::updateCategories(const QStringList &categories)
 void TodoApplet::updateColors(const QMap <QString, QVariant> &colors)
 {
     foreach(const QString &category, colors.keys()) {
-        m_types->setItemData(m_types->findText(category), 
-                             colors[category].value<QColor>(),
-                             Qt::DecorationRole);
+        if (colors[category].value<QColor>().value() > 0) {
+            m_types->setItemData(m_types->findText(category),
+                                colors[category].value<QColor>(),
+                                Qt::DecorationRole);
 
-        // search for the categories todo's to set the category color
-        foreach(const QModelIndex &index, m_model->match(m_model->index(0, 0), 
-                                                         Qt::UserRole, category, -1)) {
-            m_model->setCategory(index, colors[category].value<QColor>());
+            // search for the categories todo's to set the category color
+            foreach(const QModelIndex &index, m_model->match(m_model->index(0, 0),
+                                                            Qt::UserRole, category, -1)) {
+                m_model->setCategory(index, colors[category].value<QColor>());
+            }
         }
     }
 }
@@ -230,7 +235,7 @@ void TodoApplet::createConfigurationInterface(KConfigDialog *parent)
 void TodoApplet::configAccepted()
 {
     m_model->setCategoryType(m_configUi.categoryTypeBox->itemData(
-                               m_configUi.categoryTypeBox->currentIndex()).toInt());
+                             m_configUi.categoryTypeBox->currentIndex()).toInt());
     m_view->reset();
 
     KConfigGroup cg = config();

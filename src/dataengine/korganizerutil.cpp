@@ -16,7 +16,6 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include "korganizerutil.h"
-#include "korganizerutil_p.h"
 
 // qt headers
 #include <QColor>
@@ -30,100 +29,109 @@
 #include <KStandardDirs>
 
 // kdepim headers
-#include <kcal/calendarresources.h>
 #include <kcal/incidenceformatter.h>
-#include <kcal/resourcelocal.h>
+#include <kcal/todo.h>
+
+// Akonadi
+#include <akonadi/monitor.h>
+#include <akonadi/collection.h>
+#include <akonadi/collectionfetchjob.h>
+#include <akonadi/item.h>
+#include <akonadi/itemfetchjob.h>
+#include <akonadi/itemfetchscope.h>
 
 
-KOrganizerUtil::Private::Private(QObject *parent) : QObject(parent),
-    m_resource(0)
+class KOrganizerUtil::Private
 {
-    m_config = new KConfig("korganizerrc");
-}
+public:
+    Private(QObject *parent)
+    {
+        m_config = new KConfig("korganizerrc");
+        m_akonadiMonitor = new Akonadi::Monitor();
 
-KOrganizerUtil::Private::~Private()
-{
-    m_resource->close();
-
-    delete m_config;
-    delete m_resource;
-}
-
-QStringList KOrganizerUtil::Private::categories()
-{
-    KConfigGroup general(m_config, "General");
-    return general.readEntry("Custom Categories", QStringList());
-}
-
-QMap <QString, QVariant> KOrganizerUtil::Private::colors()
-{
-    KConfigGroup general(m_config, "Category Colors2");
-
-    QMap <QString, QVariant> colors;
-    foreach(const QString &category, categories()) {
-        colors.insert(category, QVariant(general.readEntry(category, QColor())));
+        m_akonadiMonitor->setAllMonitored(true);
     }
 
-    return colors;
-}
-
-QList <QVariant> KOrganizerUtil::Private::todos()
-{
-    if (!m_resource) {
-        kDebug() << "Opening todo file " << calendarName();
-        m_resource = new KCal::ResourceLocal(calendarName());
-        connect(m_resource, SIGNAL(resourceChanged(ResourceCalendar *)),
-                            SIGNAL(calendarChanged()));
+    ~Private()
+    {
+        delete m_config;
+        delete m_akonadiMonitor;
     }
 
-    QList <QVariant> todos;
+    Akonadi::Monitor *akonadiMonitor() const
+    {
+        return m_akonadiMonitor;
+    }
 
-    if (m_resource->load()) {
-        foreach(KCal::Todo *todo, m_resource->rawTodos()) {
-            QMap <QString, QVariant> values;
-            values ["summary"] = todo->summary();
-            values ["categories"] = todo->categoriesStr();
-            values ["status"] = todo->statusStr();
-            values ["percentComplete"] = todo->percentComplete();
-            values ["startDate"] = todo->dtStart().date();
-            values ["dueDate"] = todo->dtDue().date();
-            values ["uid"] = todo->uid();
-            values ["tooltip"] = KCal::IncidenceFormatter::toolTipString(todo, true);
+    QStringList categories()
+    {
+        KConfigGroup general(m_config, "General");
+        return general.readEntry("Custom Categories", QStringList());
+    }
 
-            todos << values;
+    QMap <QString, QVariant> colors()
+    {
+        KConfigGroup general(m_config, "Category Colors2");
+
+        QMap <QString, QVariant> colors;
+        foreach(const QString &category, categories()) {
+            colors.insert(category, QVariant(general.readEntry(category, QColor())));
         }
-    }
-    else {
-        kDebug() << "Fail to load todo list";
+
+        return colors;
     }
 
-    return todos;
-}
+    QList <QVariant> todos()
+    {
+        QList <QVariant> todos;
+        Akonadi::CollectionFetchJob *job = new Akonadi::CollectionFetchJob(Akonadi::Collection::root(),
+                                                                        Akonadi::CollectionFetchJob::Recursive);
+        if (job->exec()) {
+            Akonadi::Collection::List collections = job->collections();
+            foreach(const Akonadi::Collection &collection, collections) {
+                Akonadi::ItemFetchJob *ijob = new Akonadi::ItemFetchJob(collection);
+                ijob->fetchScope().fetchFullPayload();
 
-QString KOrganizerUtil::Private::calendarName()
-{
-    KConfigGroup general(m_config, "General");
+                if (ijob->exec()) {
+                    Akonadi::Item::List items = ijob->items();
+                    foreach(const Akonadi::Item &item, items) {
+                        if (item.hasPayload <KCal::Todo::Ptr>()) {
+                            KCal::Todo *todo = item.payload <KCal::Todo::Ptr>().get();
 
-    if (general.readPathEntry("Active Calendar", QString()).isEmpty()) {
-        // get the calendar name from the kresources configuration
-        KConfig config("kresources/calendar/stdrc");
-        KConfigGroup resources(&config, "General");
-        KConfigGroup calendar(&config, "Resource_" + resources.readEntry("Standard", ""));
+                            if (todo) {
+                                QMap <QString, QVariant> values;
+                                values ["summary"] = todo->summary();
+                                values ["categories"] = todo->categoriesStr();
+                                values ["status"] = todo->statusStr();
+                                values ["percentComplete"] = todo->percentComplete();
+                                values ["startDate"] = todo->dtStart().date();
+                                values ["dueDate"] = todo->dtDue().date();
+                                values ["uid"] = todo->uid();
+                                values ["tooltip"] = KCal::IncidenceFormatter::toolTipString(todo, true);
 
-        // return KStandardDirs::locateLocal("data", "korganizer/std.ics");
-        return calendar.readEntry("CalendarURL", QString()).replace("file://", "");
+                                todos << values;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return todos;
     }
-    else {
-        return general.readPathEntry("Active Calendar", QString()).replace("file://", "");
-    }
-}
+
+private:
+    KConfig *m_config;
+    Akonadi::Monitor *m_akonadiMonitor;
+};
+
 
 KOrganizerUtil::KOrganizerUtil(QObject *parent) : QObject(parent)
 {
     d = new KOrganizerUtil::Private(this);
 
-    connect(d, SIGNAL(calendarChanged()),
-               SIGNAL(calendarChanged()));
+    connect(d->akonadiMonitor(), SIGNAL(itemChanged (const Akonadi::Item &, const QSet< QByteArray > &)),
+                                 SIGNAL(calendarChanged()));
 }
 
 KOrganizerUtil::~KOrganizerUtil()
