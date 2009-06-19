@@ -235,8 +235,9 @@ void TodoApplet::createConfigurationInterface(KConfigDialog *parent)
 void TodoApplet::configAccepted()
 {
     m_model->setCategoryType(m_configUi.categoryTypeBox->itemData(
-                             m_configUi.categoryTypeBox->currentIndex()).toInt());
+                             m_configUi.categoryTypeBox->currentIndex()).toInt());                         
     m_view->reset();
+    m_view->setModel(m_proxyModel);
 
     KConfigGroup cg = config();
     cg.writeEntry("CategoryType", QVariant(m_model->categoryType()));
