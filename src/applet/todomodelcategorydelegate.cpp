@@ -67,7 +67,7 @@ void StartDateCategoryDelegate::categorizeItem(QStandardItem *item)
     QVariant value;
 
     if (item->data(TodoModel::PercentRole).toInt() == 100) {
-        categorySort = 0;
+        categorySort = 7;
         value = QVariant(i18n("Completed"));
     }
     else if (date == QDate::currentDate()) {
@@ -117,51 +117,52 @@ void DueDateCategoryDelegate::categorizeItem(QStandardItem *item)
     QVariant value;
 
     if (item->data(TodoModel::PercentRole).toInt() == 100) {
-        categorySort = 1;
         value = QVariant(i18n("Completed"));
     }
     else if (!date.isValid()) {
-        categorySort = 2;
+        categorySort -= 1;
         value = QVariant(i18n("Without planification"));
     }
-    else if (date == QDate::currentDate()) {
-        categorySort = 3;
-        value = QVariant(i18n("For today"));
-    }
-    else if (QDate::currentDate().daysTo(date) < 1) {
-        categorySort = 4;
-        value = QVariant(i18n("This ones had to be done"));
-    }
-    else if (QDate::currentDate().daysTo(date) == 1) {
-        categorySort = 5;
-        value = QVariant(i18n("For tomorrow"));
-    }
-    else if (QDate::currentDate().daysTo(date) > 1 &&
-             QDate::currentDate().daysTo(date) < 7) {
-        if (date.dayOfWeek() >= QDate::currentDate().dayOfWeek()) {
-            categorySort = 6;
-            value = QVariant(i18n("For this week"));
-        }
-        else {
-            categorySort = 7;
-            value = QVariant(i18n("For the next week"));
-        }
+    else if (QDate::currentDate().daysTo(date) > 30) {
+        categorySort -= 2;
+        value = QVariant(i18n("I still have enough time"));
     }
     else if (QDate::currentDate().daysTo(date) >= 7 &&
              QDate::currentDate().daysTo(date) < 30) {
         if (date.daysInMonth() >= QDate::currentDate().daysInMonth()) {
-            categorySort = 8;
+            categorySort -= 4;
             value = QVariant(i18n("For this month"));
         }
         else {
-            categorySort = 9;
+            categorySort -= 3;
             value = QVariant(i18n("For the next month"));
         }
     }
-    else if (QDate::currentDate().daysTo(date) > 30) {
-        categorySort = 10;
-        value = QVariant(i18n("I still have enough time"));
+    else if (QDate::currentDate().daysTo(date) > 1 &&
+             QDate::currentDate().daysTo(date) < 7) {
+        if (date.dayOfWeek() >= QDate::currentDate().dayOfWeek()) {
+            categorySort -= 6;
+            value = QVariant(i18n("For this week"));
+        }
+        else {
+            categorySort -= 5;
+            value = QVariant(i18n("For the next week"));
+        }
     }
+    else if (QDate::currentDate().daysTo(date) == 1) {
+        categorySort -= 7;
+        value = QVariant(i18n("For tomorrow"));
+    }
+    else if (QDate::currentDate().daysTo(date) < 1) {
+        categorySort -= 8;
+        value = QVariant(i18n("This ones had to be done"));
+    }
+    else if (date == QDate::currentDate()) {
+        categorySort -= 9;
+        value = QVariant(i18n("For today"));
+    }
+
+
 
     setDisplayRole(item, value);
     setSortRole(item, categorySort);
