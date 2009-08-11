@@ -48,6 +48,7 @@ TodoApplet::TodoApplet(QObject *parent, const QVariantList &args) :
     Plasma::PopupApplet(parent, args),
     m_engine(0),
     m_types(0),
+    m_error(0),
     m_proxyWidget(0),
     m_widget(0),
     m_view(0),
@@ -61,6 +62,7 @@ TodoApplet::TodoApplet(QObject *parent, const QVariantList &args) :
 
 TodoApplet::~TodoApplet()
 {
+    delete m_error;
     delete m_view;
     delete m_types;
 }
@@ -82,6 +84,10 @@ void TodoApplet::init()
     m_types = new QComboBox();
     connect(m_types, SIGNAL(currentIndexChanged(const QString &)),
             m_proxyModel, SLOT(setFilterRegExp(const QString &)));
+
+    // Error label
+    m_error = new QLabel();
+    m_error->setAlignment(Qt::AlignRight);
 
     // applet main widget
     m_widget = new QWidget();
@@ -111,7 +117,16 @@ void TodoApplet::dataUpdated(const QString &name, const Plasma::DataEngine::Data
         updateColors(data["colors"].toMap());
     }
     else if (QString::compare(name, TODO_SOURCE) == 0) {
-        updateTodoList(data["todos"].toList());
+        if (!data["error"].isNull()) {
+            KColorScheme colorTheme = KColorScheme(QPalette::Active, KColorScheme::View,
+                                               Plasma::Theme::defaultTheme()->colorScheme());
+            setError(i18n("<b><font color=\"%1\">%2</font></b>",
+                       colorTheme.foreground(KColorScheme::NegativeText).color().name(),
+                       data["error"].toString()));
+        }
+        else {
+            updateTodoList(data["todos"].toList());
+        }
     }
 }
 
@@ -156,6 +171,7 @@ void TodoApplet::doLayout()
         QVBoxLayout *layout = new QVBoxLayout();
         layout->addLayout(titleLayout);
         layout->addWidget(m_view);
+        layout->addWidget(m_error);
         layout->addLayout(footerLayout);
 
         m_widget->setLayout(layout);
@@ -190,6 +206,8 @@ void TodoApplet::updateColors(const QMap <QString, QVariant> &colors)
 
 void TodoApplet::updateTodoList(const QList <QVariant> &todos)
 {
+    setError(QString());
+
     m_model->clear();
 
     foreach(const QVariant &todo, todos) {
@@ -199,6 +217,11 @@ void TodoApplet::updateTodoList(const QList <QVariant> &todos)
     }
 
     m_view->reset();
+}
+
+void TodoApplet::setError(const QString &message)
+{
+    m_error->setText(message);
 }
 
 void TodoApplet::slotOpenTodo(const QModelIndex &index)

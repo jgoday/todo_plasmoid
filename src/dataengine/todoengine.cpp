@@ -63,7 +63,13 @@ bool TodoEngine::updateSourceEvent(const QString &name)
         setData(I18N_NOOP(name), I18N_NOOP("colors"), m_util->colors());
     }
     else if(QString::compare(name, TODO_SOURCE) == 0) {
-        setData(I18N_NOOP(name), I18N_NOOP("todos"), m_util->todos());
+        if (m_util->isAkonadiRunning()) {
+            setData(I18N_NOOP(name), I18N_NOOP("todos"), m_util->todos());
+        }
+        else {
+            setData(I18N_NOOP(name), I18N_NOOP("error"),
+                    I18N_NOOP("Akonadi is not running"));
+        }
     }
     return true;
 }

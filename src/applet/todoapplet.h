@@ -30,6 +30,7 @@
 class QComboBox;
 class QGraphicsLinearLayout;
 class QGraphicsProxyWidget;
+class QLabel;
 class QModelIndex;
 class KCategorizedSortFilterProxyModel;
 class KConfigDialog;
@@ -66,11 +67,13 @@ private:
     void updateCategories(const QStringList &categories);
     void updateColors(const QMap <QString, QVariant> &colors);
     void updateTodoList(const QList <QVariant> &todos);
+    void setError(const QString &error);
 
 private:
     Plasma::DataEngine    *m_engine;
 
     QComboBox             *m_types; // todos categories combobox
+    QLabel                *m_error;
     QGraphicsProxyWidget  *m_proxyWidget; // proxy widget
     QWidget               *m_widget; // main widget
 

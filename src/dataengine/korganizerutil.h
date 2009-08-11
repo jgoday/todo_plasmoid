@@ -32,6 +32,8 @@ public:
     QMap <QString, QVariant> colors() const;
     QList <QVariant> todos() const;
 
+    bool isAkonadiRunning() const;
+
 signals:
     void calendarChanged();
 

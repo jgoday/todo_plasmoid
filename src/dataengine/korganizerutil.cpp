@@ -32,6 +32,7 @@
 #include <kcal/todo.h>
 
 // Akonadi
+#include <akonadi/servermanager.h>
 #include <akonadi/monitor.h>
 #include <akonadi/collection.h>
 #include <akonadi/collectionfetchjob.h>
@@ -119,6 +120,11 @@ public:
         return todos;
     }
 
+    bool isAkonadiRunning() const
+    {
+        return Akonadi::ServerManager::isRunning();
+    }
+
 private:
     KConfig *m_config;
     Akonadi::Monitor *m_akonadiMonitor;
@@ -151,4 +157,9 @@ QMap <QString, QVariant> KOrganizerUtil::colors() const
 QList <QVariant> KOrganizerUtil::todos() const
 {
     return d->todos();
+}
+
+bool KOrganizerUtil::isAkonadiRunning() const
+{
+    return d->isAkonadiRunning();
 }
