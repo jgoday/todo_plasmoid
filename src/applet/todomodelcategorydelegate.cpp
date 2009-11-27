@@ -163,7 +163,6 @@ void DueDateCategoryDelegate::categorizeItem(QStandardItem *item)
     }
 
 
-
     setDisplayRole(item, value);
     setSortRole(item, categorySort);
 }

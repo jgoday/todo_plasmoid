@@ -135,7 +135,11 @@ KOrganizerUtil::KOrganizerUtil(QObject *parent) : QObject(parent)
 {
     d = new KOrganizerUtil::Private(this);
 
-    connect(d->akonadiMonitor(), SIGNAL(itemChanged (const Akonadi::Item &, const QSet< QByteArray > &)),
+    connect(d->akonadiMonitor(), SIGNAL(itemChanged(const Akonadi::Item &, const QSet< QByteArray > &)),
+                                 SIGNAL(calendarChanged()));
+    connect(d->akonadiMonitor(), SIGNAL(itemAdded(const Akonadi::Item &, const Akonadi::Collection &)),
+                                 SIGNAL(calendarChanged()));
+    connect(d->akonadiMonitor(), SIGNAL(itemRemoved(const Akonadi::Item &)),
                                  SIGNAL(calendarChanged()));
 }
 

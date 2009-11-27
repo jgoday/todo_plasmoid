@@ -22,6 +22,8 @@
 class KOrganizerUtil : public QObject
 {
 public:
+    static void deleteTodo(const QString &uid);
+    static void editTodo(const QString &uid);
     static void showTodo(const QString &uid);
     static void showAddTodo();
 

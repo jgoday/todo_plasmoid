@@ -135,8 +135,6 @@ void TodoApplet::doLayout()
     if (!m_view) {
         m_view = new TodoView();
         m_view->setModel(m_proxyModel);
-        connect(m_view, SIGNAL(doubleClicked(const QModelIndex &)),
-                        SLOT(slotOpenTodo(const QModelIndex &)));
         KColorScheme colorTheme = KColorScheme(QPalette::Active, KColorScheme::View,
                                                Plasma::Theme::defaultTheme()->colorScheme());
 
@@ -216,18 +214,12 @@ void TodoApplet::updateTodoList(const QList <QVariant> &todos)
         m_model->addTodoItem(values);
     }
 
-    m_view->reset();
+//    m_view->reset();
 }
 
 void TodoApplet::setError(const QString &message)
 {
     m_error->setText(message);
-}
-
-void TodoApplet::slotOpenTodo(const QModelIndex &index)
-{
-    KOrganizerUtil::showTodo(m_model->data(m_proxyModel->mapToSource(index),
-                                           TodoModel::UIDRole).toString());
 }
 
 void TodoApplet::slotAddTodo()
@@ -256,10 +248,12 @@ void TodoApplet::createConfigurationInterface(KConfigDialog *parent)
 
 void TodoApplet::configAccepted()
 {
+    m_proxyModel->setCategorizedModel(false);
+
     m_model->setCategoryType(m_configUi.categoryTypeBox->itemData(
-                             m_configUi.categoryTypeBox->currentIndex()).toInt());                         
-    m_view->reset();
-    m_view->setModel(m_proxyModel);
+                             m_configUi.categoryTypeBox->currentIndex()).toInt());
+
+    m_proxyModel->setCategorizedModel(true);
 
     KConfigGroup cg = config();
     cg.writeEntry("CategoryType", QVariant(m_model->categoryType()));

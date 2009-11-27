@@ -1,3 +1,9 @@
+2009-11-25
+- [done] Check for new and deleted tasks
+- [done] Confirm delete tasks
+- [    ] Exclude finished
+- [    ] Edit percentage inline
+
 - [done] Call korganizer to show a todo item when dbl click
 - [done] Allow categorize by startDate and dueDate (actually only can categorize by startDate)
 - [done] Add tooltip

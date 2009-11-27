@@ -31,6 +31,17 @@
 #include <KWindowSystem>
 
 
+void KOrganizerUtil::deleteTodo(const QString &uid)
+{
+    checkAndLaunchKontact();
+
+    OrgKdeKorganizerKorganizerInterface interface("org.kde.korganizer",
+                                                  "/Korganizer",
+                                                  QDBusConnection::sessionBus());
+    interface.deleteIncidence(uid, true);
+    KOrganizerUtil::showMainWindow();
+}
+
 void KOrganizerUtil::showTodo(const QString &uid)
 {
     checkAndLaunchKontact();
@@ -39,6 +50,17 @@ void KOrganizerUtil::showTodo(const QString &uid)
                                                   "/Korganizer",
                                                   QDBusConnection::sessionBus());
     interface.showIncidence(uid);
+    KOrganizerUtil::showMainWindow();
+}
+
+void KOrganizerUtil::editTodo(const QString &uid)
+{
+    checkAndLaunchKontact();
+
+    OrgKdeKorganizerKorganizerInterface interface("org.kde.korganizer",
+                                                  "/Korganizer",
+                                                  QDBusConnection::sessionBus());
+    interface.editIncidence(uid);
     KOrganizerUtil::showMainWindow();
 }
 

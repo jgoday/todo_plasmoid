@@ -67,6 +67,7 @@ bool TodoEngine::updateSourceEvent(const QString &name)
             setData(I18N_NOOP(name), I18N_NOOP("todos"), m_util->todos());
         }
         else {
+            kDebug() << "TodoEngine::updateSourceEvent: Is akonadi running ? NO";
             setData(I18N_NOOP(name), I18N_NOOP("error"),
                     I18N_NOOP("Akonadi is not running"));
         }

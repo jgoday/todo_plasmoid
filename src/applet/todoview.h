@@ -20,6 +20,9 @@
 // kde headers
 #include <kcategorizedview.h>
 
+class QAction;
+class QContextMenuEvent;
+
 /**
 * Categorized view that represents the todo list in the plasma applet
 * The todos are categorized by startDate by the model
@@ -30,6 +33,11 @@ class TodoView : public KCategorizedView
 public:
     TodoView(QWidget *parent = 0);
     ~TodoView();
+
+    void contextMenuEvent(QContextMenuEvent *event);
+
+private slots:
+    void slotActionClicked(QAction *);
 };
 
 #endif

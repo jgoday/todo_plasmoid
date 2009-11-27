@@ -51,7 +51,6 @@ public slots:
     void dataUpdated(const QString &name, const Plasma::DataEngine::Data &data);
 
 private slots:
-    void slotOpenTodo(const QModelIndex &index);
     void slotAddTodo();
 
 protected slots:

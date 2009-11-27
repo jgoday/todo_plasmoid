@@ -20,6 +20,9 @@
 // Qt headers
 #include <QAbstractItemModel>
 #include <QApplication>
+#include <QDebug>
+#include <QEvent>
+#include <QMouseEvent>
 
 TodoItemDelegate::TodoItemDelegate(QObject *parent) : QStyledItemDelegate(parent)
 {
